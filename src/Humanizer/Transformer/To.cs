@@ -1,4 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+
+#if NETCOREAPP2_1
+using System.Buffers;
+#else
+using System.Linq;
+#endif
 
 namespace Humanizer
 {
@@ -7,6 +13,42 @@ namespace Humanizer
     /// </summary>
     public static class To
     {
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Transforms a string using the provided transformers. Transformations are applied in the provided order.
+        /// </summary>
+        public static string Transform(this string input, params IStringTransformer[] transformers)
+        {
+            var pool = ArrayPool<char>.Shared;
+            var chars = pool.Rent(input.Length);
+            try
+            {
+                var output = chars.AsSpan(0, input.Length);
+                Transform(input.AsSpan(), output);
+                return output.ToString();
+            }
+            finally
+            {
+                pool.Return(chars);
+            }
+        }
+
+        /// <summary>
+        /// Transforms a char-span using the provided transformers. Transformations are applied in the provided order.
+        /// </summary>
+        public static void Transform(this ReadOnlySpan<char> input, Span<char> output, params IStringTransformer[] transformers)
+        {
+            if (output.Length < input.Length)
+                throw new ArgumentException("Output length must equal or exceed input length.");
+
+            input.CopyTo(output);
+
+            for (var i = 0; i < transformers.Length; i++)
+            {
+                transformers[i].Transform(output);
+            }
+        }
+#else
         /// <summary>
         /// Transforms a string using the provided transformers. Transformations are applied in the provided order.
         /// </summary>
@@ -17,6 +59,7 @@ namespace Humanizer
         {
             return transformers.Aggregate(input, (current, stringTransformer) => stringTransformer.Transform(current));
         }
+#endif
 
         /// <summary>
         /// Changes string to title case
@@ -24,13 +67,7 @@ namespace Humanizer
         /// <example>
         /// "INvalid caSEs arE corrected" -> "Invalid Cases Are Corrected"
         /// </example>
-        public static IStringTransformer TitleCase
-        {
-            get
-            {
-                return new ToTitleCase();
-            }
-        }
+        public static readonly IStringTransformer TitleCase = new ToTitleCase();
 
         /// <summary>
         /// Changes the string to lower case
@@ -38,13 +75,7 @@ namespace Humanizer
         /// <example>
         /// "Sentence casing" -> "sentence casing"
         /// </example>
-        public static IStringTransformer LowerCase
-        {
-            get
-            {
-                return new ToLowerCase();
-            }
-        }
+        public static readonly IStringTransformer LowerCase = new ToLowerCase();
 
         /// <summary>
         /// Changes the string to upper case
@@ -52,13 +83,7 @@ namespace Humanizer
         /// <example>
         /// "lower case statement" -> "LOWER CASE STATEMENT"
         /// </example>
-        public static IStringTransformer UpperCase
-        {
-            get
-            {
-                return new ToUpperCase();
-            }
-        }
+        public static readonly IStringTransformer UpperCase = new ToUpperCase();
 
         /// <summary>
         /// Changes the string to sentence case
@@ -66,12 +91,6 @@ namespace Humanizer
         /// <example>
         /// "lower case statement" -> "Lower case statement"
         /// </example>
-        public static IStringTransformer SentenceCase
-        {
-            get
-            {
-                return new ToSentenceCase();
-            }
-        }
+        public static readonly IStringTransformer SentenceCase = new ToSentenceCase();
     }
 }

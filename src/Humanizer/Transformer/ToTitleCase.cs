@@ -11,7 +11,7 @@ namespace Humanizer
 {
     internal class ToTitleCase : IStringTransformer
     {
-        private const string _wordsRegex = @"(\w|[^\u0000-\u007F])+'?\w*";
+        private static readonly Regex _words = new Regex(@"(\w|[^\u0000-\u007F])+'?\w*", RegexOptions.ExplicitCapture | RegexOptionsUtil.Compiled);
 
 #if NETCOREAPP2_1
         public string Transform(string input)
@@ -23,7 +23,7 @@ namespace Humanizer
                 var output = chars.AsSpan(0, input.Length);
                 input.AsSpan().CopyTo(output);
 
-                var matches = Regex.Matches(input, _wordsRegex);
+                var matches = _words.Matches(input);
                 foreach (Match match in matches)
                 {
                     var word = output.Slice(match.Index, match.Length);
@@ -43,7 +43,7 @@ namespace Humanizer
 
         public void Transform(Span<char> chars)
         {
-            var matches = Regex.Matches(chars.ToString(), _wordsRegex);
+            var matches = _words.Matches(chars.ToString());
             foreach (Match match in matches)
             {
                 var word = chars.Slice(match.Index, match.Length);
@@ -82,7 +82,7 @@ namespace Humanizer
         public string Transform(string input)
         {
             var result = input;
-            var matches = Regex.Matches(input, _wordsRegex);
+            var matches = _words.Matches(input);
             foreach (Match word in matches)
             {
                 if (!AllCapitals(word.Value))

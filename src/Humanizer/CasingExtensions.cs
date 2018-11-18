@@ -33,5 +33,35 @@ namespace Humanizer
                     throw new ArgumentOutOfRangeException(nameof(casing));
             }
         }
+
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Changes the casing of the provided input
+        /// </summary>
+        public static void ApplyCase(this Span<char> chars, LetterCasing casing)
+        {
+            switch (casing)
+            {
+                case LetterCasing.Title:
+                    chars.Transform(To.TitleCase);
+                    break;
+
+                case LetterCasing.LowerCase:
+                    chars.Transform(To.LowerCase);
+                    break;
+
+                case LetterCasing.AllCaps:
+                    chars.Transform(To.UpperCase);
+                    break;
+
+                case LetterCasing.Sentence:
+                    chars.Transform(To.SentenceCase);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(casing));
+            }
+        }
+#endif
     }
 }

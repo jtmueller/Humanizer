@@ -24,7 +24,7 @@ namespace Humanizer
             try
             {
                 var output = chars.AsSpan(0, input.Length);
-                Transform(input.AsSpan(), output);
+                Transform(input.AsSpan(), output, transformers);
                 return output.ToString();
             }
             finally
@@ -42,12 +42,22 @@ namespace Humanizer
                 throw new ArgumentException("Output length must equal or exceed input length.");
 
             input.CopyTo(output);
+            Transform(output, transformers);
+        }
 
+        /// <summary>
+        /// Transforms a char-span in place using the provided transformers. Transformations are applied in the provided order.
+        /// </summary>
+        /// <param name="chars"></param>
+        /// <param name="transformers"></param>
+        public static void Transform(this Span<char> chars, params IStringTransformer[] transformers)
+        {
             for (var i = 0; i < transformers.Length; i++)
             {
-                transformers[i].Transform(output);
+                transformers[i].Transform(chars);
             }
         }
+
 #else
         /// <summary>
         /// Transforms a string using the provided transformers. Transformations are applied in the provided order.

@@ -169,6 +169,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)OrdinalizeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ResourceKeyTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RomanNumeralTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SpanSplitTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringDehumanizeTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringExtensionsTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringHumanizeTests.cs" />

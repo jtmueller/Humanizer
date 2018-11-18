@@ -13,11 +13,8 @@ namespace Humanizer
 #if NETCOREAPP2_1
         public void Transform(Span<char> chars)
         {
-            var ti = CultureInfo.CurrentCulture.TextInfo;
-            for (var i = 0; i < chars.Length; i++)
-            {
-                chars[i] = ti.ToUpper(chars[i]);
-            }
+            var ci = CultureInfo.CurrentCulture;
+            MemoryExtensions.ToUpper(chars, chars, ci);
         }
 #endif
     }

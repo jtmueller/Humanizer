@@ -80,6 +80,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{AA44
 		..\NuSpecs\Humanizer.nuspec = ..\NuSpecs\Humanizer.nuspec
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Humanizer.Benchmarks", "Humanizer.Benchmarks\Humanizer.Benchmarks.csproj", "{72876181-4AF0-41CA-AAD1-13C5329632E5}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Humanizer.Tests.Shared\Humanizer.Tests.Shared.projitems*{f886a8da-3efc-4a89-91dd-06faf13da172}*SharedItemsImports = 4
@@ -128,6 +130,22 @@ Global
 		{511A7984-F455-4A6E-ADB9-9CAAC47EA079}.Release|x64.Build.0 = Release|Any CPU
 		{511A7984-F455-4A6E-ADB9-9CAAC47EA079}.Release|x86.ActiveCfg = Release|Any CPU
 		{511A7984-F455-4A6E-ADB9-9CAAC47EA079}.Release|x86.Build.0 = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|ARM.Build.0 = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|x64.Build.0 = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Debug|x86.Build.0 = Debug|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|ARM.ActiveCfg = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|ARM.Build.0 = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|x64.ActiveCfg = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|x64.Build.0 = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|x86.ActiveCfg = Release|Any CPU
+		{72876181-4AF0-41CA-AAD1-13C5329632E5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -137,6 +155,7 @@ Global
 		{97AAE24D-0488-42AE-A585-86D882F23D5F} = {4779A7C9-9ED8-4146-A158-FBE0B1BE09D9}
 		{FDEC244B-F07E-4A5E-BB80-FBC6AC77A9AA} = {04B74BEC-A645-4D1A-BE21-F4EB4413A903}
 		{AA449265-E001-486D-A0F4-04ACF0C83DC1} = {4779A7C9-9ED8-4146-A158-FBE0B1BE09D9}
+		{72876181-4AF0-41CA-AAD1-13C5329632E5} = {04B74BEC-A645-4D1A-BE21-F4EB4413A903}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {10734D28-C2BF-454A-AD65-29147C28B141}

@@ -6,17 +6,16 @@ using BenchmarkDotNet.Attributes;
 namespace Humanizer.Benchmarks
 {
     [ClrJob(true), CoreJob, MemoryDiagnoser]
-    public class TransformersBenchmarks
+    public class StringHumanizeBenchmarks
     {
         // hard-coded seed ensures the same random strings are generated each time.
-        private const int RAND_SEED = 17432;
+        private const int RAND_SEED = 11917;
 
-        private static readonly char[] _alphabet = 
-            Enumerable.Repeat((int)' ', 15)
+        private static readonly char[] _alphabet =
+            Enumerable.Repeat(new int[] { '_', '-', ' ' }, 10).SelectMany(x => x)
                 .Concat(Enumerable.Range('a', 'z' - 'a'))
                 .Concat(Enumerable.Range('A', 'Z' - 'A'))
                 .Concat(Enumerable.Range('0', '9' - '0'))
-                .Concat(new int[] { '.', ',', '(', ')', '!', '$' })
                 .Select(x => (char)x)
                 .ToArray();
 
@@ -38,33 +37,33 @@ namespace Humanizer.Benchmarks
         }
 
         [Benchmark]
-        public void AllTransforms()
+        public void Humanize()
         {
-            _input.Transform(To.LowerCase, To.UpperCase, To.SentenceCase, To.TitleCase);
+            _input.Humanize();
         }
 
         [Benchmark]
-        public void LowerCase()
+        public void HumanizeToLowerCase()
         {
-            _input.Transform(To.LowerCase);
+            _input.Humanize(LetterCasing.LowerCase);
         }
 
         [Benchmark]
-        public void UpperCase()
+        public void HumanizeToUpperCase()
         {
-            _input.Transform(To.UpperCase);
+            _input.Humanize(LetterCasing.AllCaps);
         }
 
         [Benchmark]
-        public void SentenceCase()
+        public void HumanizeToSentenceCase()
         {
-            _input.Transform(To.SentenceCase);
+            _input.Humanize(LetterCasing.Sentence);
         }
 
         [Benchmark]
-        public void TitleCase()
+        public void HumanizeToTitleCase()
         {
-            _input.Transform(To.TitleCase);
+            _input.Humanize(LetterCasing.Title);
         }
     }
 }

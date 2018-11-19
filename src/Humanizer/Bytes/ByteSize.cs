@@ -419,6 +419,95 @@ namespace Humanizer.Bytes
             return b1.Bits >= b2.Bits;
         }
 
+#if NETCOREAPP2_1
+        public static bool TryParse(ReadOnlySpan<char> s, out ByteSize result)
+        {
+            // Arg checking
+            if (s.IsEmpty || s.IsWhiteSpace())
+            {
+                throw new ArgumentNullException(nameof(s), "String is null or whitespace");
+            }
+
+            // Setup the result
+            result = default;
+
+            // Get the index of the first non-digit character
+            s = s.TrimStart(); // Protect against leading spaces
+
+            int num;
+            var found = false;
+
+            // Acquiring culture specific decimal separator
+            var decSep = Convert.ToChar(System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
+
+            // Pick first non-digit number
+            for (num = 0; num < s.Length; num++)
+            {
+                if (!(char.IsDigit(s[num]) || s[num] == decSep))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                return false;
+            }
+
+            var lastNumber = num;
+
+            // Cut the input string in half
+            var numberPart = s.Slice(0, lastNumber).Trim();
+            var sizePart = s.Slice(lastNumber, s.Length - lastNumber).Trim();
+
+            // Get the numeric part
+            if (!double.TryParse(numberPart, out var number))
+            {
+                return false;
+            }
+
+            // Get the magnitude part
+            if (sizePart.Equals(ByteSymbol, StringComparison.OrdinalIgnoreCase))
+            {
+                if (sizePart.Equals(BitSymbol, StringComparison.Ordinal))
+                { // Bits
+                    if (number % 1 != 0) // Can't have partial bits
+                    {
+                        return false;
+                    }
+
+                    result = FromBits((long)number);
+                }
+                else
+                { // Bytes
+                    result = FromBytes(number);
+                }
+            }
+            else if (sizePart.Equals(KilobyteSymbol, StringComparison.OrdinalIgnoreCase))
+            {
+                result = FromKilobytes(number);
+            }
+            else if (sizePart.Equals(MegabyteSymbol, StringComparison.OrdinalIgnoreCase))
+            {
+                result = FromMegabytes(number);
+            }
+            else if (sizePart.Equals(GigabyteSymbol, StringComparison.OrdinalIgnoreCase))
+            {
+                result = FromGigabytes(number);
+            }
+            else if (sizePart.Equals(TerabyteSymbol, StringComparison.OrdinalIgnoreCase))
+            {
+                result = FromTerabytes(number);
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+        }
+#else
         public static bool TryParse(string s, out ByteSize result)
         {
             // Arg checking
@@ -500,10 +589,14 @@ namespace Humanizer.Bytes
                 case TerabyteSymbol:
                     result = FromTerabytes(number);
                     break;
+
+                default:
+                    return false;
             }
 
             return true;
         }
+#endif
 
         public static ByteSize Parse(string s)
         {

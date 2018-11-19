@@ -46,11 +46,11 @@ namespace Humanizer
         /// <summary>
         /// Symbols is a list of every symbols for the Metric system.
         /// </summary>
-        private static readonly List<char>[] Symbols =
-                {
-                    new List<char> { 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' },
-                    new List<char> { 'm', 'μ', 'n', 'p', 'f', 'a', 'z', 'y' }
-                };
+        private static readonly char[][] Symbols =
+            new[] {
+                new[] { 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' },
+                new[] { 'm', 'μ', 'n', 'p', 'f', 'a', 'z', 'y' }
+            };
 
         /// <summary>
         /// Names link a Metric symbol (as key) to its name (as value).
@@ -63,10 +63,10 @@ namespace Humanizer
         /// {'c', "centi"},
         /// </remarks>
         private static readonly Dictionary<char, string> Names = new Dictionary<char, string>
-                {
-                         {'Y', "yotta" }, {'Z', "zetta" }, {'E', "exa" }, {'P', "peta" }, {'T', "tera" }, {'G', "giga" }, {'M', "mega" }, {'k', "kilo" },
-                         {'m', "milli" }, {'μ', "micro" }, {'n', "nano" }, {'p', "pico" }, {'f', "femto" }, {'a', "atto" }, {'z', "zepto" }, {'y', "yocto" }
-                };
+            {
+                {'Y', "yotta" }, {'Z', "zetta" }, {'E', "exa" }, {'P', "peta" }, {'T', "tera" }, {'G', "giga" }, {'M', "mega" }, {'k', "kilo" },
+                {'m', "milli" }, {'μ', "micro" }, {'n', "nano" }, {'p', "pico" }, {'f', "femto" }, {'a', "atto" }, {'z', "zepto" }, {'y', "yocto" }
+            };
 
         /// <summary>
         /// Converts a Metric representation into a number.
@@ -183,6 +183,23 @@ namespace Humanizer
                 : double.Parse(input);
         }
 
+#if NETCOREAPP2_1
+        /// <summary>
+        /// Build a number from a metric representation
+        /// </summary>
+        /// <param name="input">A Metric representation to parse to a number</param>
+        /// <param name="last">The last character of input</param>
+        /// <returns>A number build from a Metric representation</returns>
+        private static double BuildMetricNumber(ReadOnlySpan<char> input, char last)
+        {
+            double getExponent(char[] symbols) => (Array.IndexOf(symbols, last) + 1) * 3;
+            var number = double.Parse(input.Slice(0, input.Length - 1));
+            var exponent = Math.Pow(10, Symbols[0].Contains(last)
+                ? getExponent(Symbols[0])
+                : -getExponent(Symbols[1]));
+            return number * exponent;
+        }
+#else
         /// <summary>
         /// Build a number from a metric representation
         /// </summary>
@@ -191,13 +208,14 @@ namespace Humanizer
         /// <returns>A number build from a Metric representation</returns>
         private static double BuildMetricNumber(string input, char last)
         {
-            double getExponent(List<char> symbols) => (symbols.IndexOf(last) + 1) * 3;
+            double getExponent(char[] symbols) => (Array.IndexOf(symbols, last) + 1) * 3;
             var number = double.Parse(input.Remove(input.Length - 1));
             var exponent = Math.Pow(10, Symbols[0].Contains(last)
                 ? getExponent(Symbols[0])
                 : -getExponent(Symbols[1]));
             return number * exponent;
         }
+#endif
 
         /// <summary>
         /// Replace every symbol's name by its symbol representation.
@@ -275,7 +293,26 @@ namespace Humanizer
                    || (Math.Sign(input) == -1 && outside(-BigLimit, -SmallLimit));
         }
 
+#if NETCOREAPP2_1
         /// <summary>
+        /// Check if a string is not a valid Metric representation.
+        /// A valid representation is in the format "{0}{1}" or "{0} {1}"
+        /// where {0} is a number and {1} is an allowed symbol.
+        /// </summary>
+        /// <remarks>
+        /// ToDo: Performance: Use (string input, out number) to escape the double use of Parse()
+        /// </remarks>
+        /// <param name="input">A string who might contain a invalid Metric representation.</param>
+        /// <returns>True if input is not a valid Metric representation.</returns>
+        private static bool IsInvalidMetricNumeral(this string input)
+        {
+            var index = input.Length - 1;
+            var last = input[index];
+            var isSymbol = Symbols[0].Contains(last) || Symbols[1].Contains(last);
+            return !double.TryParse(isSymbol ? input.AsSpan().Slice(0, index) : input, out var number);
+        }
+#else
+                /// <summary>
         /// Check if a string is not a valid Metric representation.
         /// A valid representation is in the format "{0}{1}" or "{0} {1}"
         /// where {0} is a number and {1} is an allowed symbol.
@@ -292,5 +329,6 @@ namespace Humanizer
             var isSymbol = Symbols[0].Contains(last) || Symbols[1].Contains(last);
             return !double.TryParse(isSymbol ? input.Remove(index) : input, out var number);
         }
+#endif
     }
 }

@@ -48,9 +48,14 @@ namespace Humanizer
         public static void Humanize(this ReadOnlySpan<char> input, StringBuilder output, LetterCasing? casing = null) => 
             Humanize(input.ToString(), output, casing);
 
-        private static void Humanize(this string input, StringBuilder output, LetterCasing? casing = null)
+        /// <summary>
+        /// Humanizes the input string; e.g. Underscored_input_String_is_turned_INTO_sentence -> 'Underscored input String is turned INTO sentence'
+        /// </summary>
+        public static void Humanize(this string input, StringBuilder output, LetterCasing? casing = null)
         {
+            var foo = input.AsMemory();
             var chars = input.AsSpan();
+            var startLen = output.Length;
 
             // if input is all capitals (e.g. an acronym) then return it without change
             if (AllCapitals(chars))
@@ -90,22 +95,23 @@ namespace Humanizer
 
             if (casing.HasValue)
             {
-                ApplyCase(output, casing.Value);
+                ApplyCase(output, startLen, casing.Value);
             }
         }
 
-        private static void ApplyCase(StringBuilder builder, LetterCasing casing)
+        private static void ApplyCase(StringBuilder builder, int startIndex, LetterCasing casing)
         {
+            var length = builder.Length - startIndex;
             var pool = ArrayPool<char>.Shared;
-            var chars = pool.Rent(builder.Length);
+            var chars = pool.Rent(length);
             try
             {
-                var span = chars.AsSpan(0, builder.Length);
-                builder.CopyTo(0, span, builder.Length);
+                var span = chars.AsSpan(0, length);
+                builder.CopyTo(startIndex, span, length);
 
                 span.ApplyCase(casing);
 
-                builder.Clear();
+                builder.Remove(startIndex, length);
                 builder.Append(span);
             }
             finally

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 using BenchmarkDotNet.Attributes;
 
@@ -11,15 +10,6 @@ namespace Humanizer.Benchmarks
         // hard-coded seed ensures the same random strings are generated each time.
         private const int RAND_SEED = 17432;
 
-        private static readonly char[] _alphabet = 
-            Enumerable.Repeat((int)' ', 15)
-                .Concat(Enumerable.Range('a', 'z' - 'a'))
-                .Concat(Enumerable.Range('A', 'Z' - 'A'))
-                .Concat(Enumerable.Range('0', '9' - '0'))
-                .Concat(new int[] { '.', ',', '(', ')', '!', '$' })
-                .Select(x => (char)x)
-                .ToArray();
-
         private readonly Random _random = new Random(RAND_SEED);
         private string _input;
 
@@ -29,12 +19,7 @@ namespace Humanizer.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
-            var chars = new char[StringLen];
-            for (var i = 0; i < StringLen; i++)
-            {
-                chars[i] = _alphabet[_random.Next(0, _alphabet.Length)];
-            }
-            _input = new string(chars);
+            _input = StringGenerator.Generate(_random, StringLen, includeSpaces: true, includeSymbols: true);
         }
 
         [Benchmark]
